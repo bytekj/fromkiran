@@ -793,3 +793,101 @@ button:focus-visible {
   left: 0;
   right: 0;
 }
+
+/* ---------- refinement: tidy and professional, keeping the postal details ---------- */
+
+/* aligned, not scattered */
+.tilt-0,
+.tilt-1,
+.tilt-2,
+.tilt-3,
+.tilt-4,
+.tilt-5 {
+  transform: none;
+}
+
+.postcard {
+  transform: none;
+  border-radius: 12px;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06), 0 12px 28px rgba(0, 0, 0, 0.35);
+}
+
+.sender {
+  transform: none;
+  border-radius: 12px;
+  box-shadow: none;
+}
+
+/* keep: stamp, postmark, wavy cancel lines, handwritten address and sign-off.
+   soften: thin solid lines instead of heavy dashes */
+.pc-stamp {
+  border: 1.5px solid var(--ink);
+  outline: 2px dotted rgba(21, 21, 21, 0.45);
+  outline-offset: 3px;
+}
+
+.pc-postmark {
+  opacity: 0.6;
+  transform: rotate(-10deg);
+}
+
+.pc-tag {
+  transform: none;
+  border-width: 1.5px;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.sender-tag {
+  padding: 0 0 4px;
+  border: 0;
+  border-bottom: 2px solid var(--ink);
+  border-radius: 0;
+  font-size: 13px;
+}
+
+.home-section-head {
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(244, 241, 240, 0.15);
+}
+
+.home-section-head h2 {
+  font-size: 26px;
+}
+
+/* envelopes: even grid, airmail stripe and postmark kept, calmer details */
+.envelope {
+  border-radius: 12px;
+  transition: transform 0.15s ease;
+}
+
+.envelope:hover {
+  transform: translateY(-3px);
+}
+
+.env-stripe {
+  height: 8px;
+}
+
+.env-stamp {
+  max-width: none;
+  padding: 2px 10px;
+  border: 1.5px solid rgba(21, 21, 21, 0.6);
+  border-radius: 4px;
+}
+
+.env-postmark {
+  transform: rotate(-3deg);
+  font-size: 16px;
+}
+
+.env-title {
+  font-size: 22px;
+}
+
+/* slips: still handwritten, but flat and tidy */
+.slip {
+  border: 1px solid rgba(21, 21, 21, 0.1);
+  border-radius: 12px;
+  box-shadow: none;
+}
