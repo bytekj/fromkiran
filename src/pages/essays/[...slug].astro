@@ -1,0 +1,36 @@
+---
+import { render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { getEssays, topicName } from '../../lib/essays';
+import { formatDate, readingLabel } from '../../lib/format';
+
+export async function getStaticPaths() {
+  const essays = await getEssays();
+  return essays.map((essay) => ({
+    params: { slug: essay.id },
+    props: { essay },
+  }));
+}
+
+const { essay } = Astro.props;
+const { Content } = await render(essay);
+const { title, description, pubDate, topic } = essay.data;
+---
+
+<Base title={title} description={description}>
+  <div class="page">
+    <div style="max-width: 820px; margin: 0 auto; width: 100%;">
+      <a href="/essays/" class="back-link">← सर्व लेख</a>
+    </div>
+    <article class="essay">
+      <div class="meta">
+        <a href={`/topics/${topic}/`}>{topicName(topic)}</a> · {formatDate(pubDate)} · {readingLabel(essay.body)} वाचन
+      </div>
+      <h1>{title}</h1>
+      <p class="lead">{description}</p>
+      <div class="prose">
+        <Content />
+      </div>
+    </article>
+  </div>
+</Base>

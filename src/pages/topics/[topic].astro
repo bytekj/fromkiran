@@ -1,0 +1,40 @@
+---
+import Base from '../../layouts/Base.astro';
+import EssayCard from '../../components/EssayCard.astro';
+import { TOPICS } from '../../config';
+import { getEssays } from '../../lib/essays';
+
+export function getStaticPaths() {
+  return TOPICS.map((t) => ({ params: { topic: t.slug }, props: { name: t.name } }));
+}
+
+const { topic } = Astro.params;
+const { name } = Astro.props;
+const essays = (await getEssays()).filter((e) => e.data.topic === topic);
+---
+
+<Base title={name} description={`${name} — जीवनगाणे वरील लेख.`}>
+  <div class="page">
+    <h1 class="section-title" style="font-size: clamp(32px, 4.4vw, 48px);">{name}</h1>
+    <div class="pill-row">
+      {
+        TOPICS.map((t) => (
+          <a class={`pill${t.slug === topic ? ' active' : ''}`} href={`/topics/${t.slug}/`}>
+            {t.name}
+          </a>
+        ))
+      }
+    </div>
+    {
+      essays.length > 0 ? (
+        <div class="row">
+          {essays.map((essay) => (
+            <EssayCard essay={essay} />
+          ))}
+        </div>
+      ) : (
+        <p>या विषयात अजून लेख नाहीत.</p>
+      )
+    }
+  </div>
+</Base>

@@ -1,0 +1,17 @@
+---
+import type { Essay } from '../lib/essays';
+import { topicName } from '../lib/essays';
+import { readingLabel } from '../lib/format';
+
+interface Props {
+  essay: Essay;
+}
+
+const { essay } = Astro.props;
+---
+
+<a href={`/essays/${essay.id}/`} class="card">
+  <span class="meta">{topicName(essay.data.topic)} · {readingLabel(essay.body)}</span>
+  <span class="title">{essay.data.title}</span>
+  <span class="desc">{essay.data.description}</span>
+</a>

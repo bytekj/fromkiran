@@ -1,0 +1,79 @@
+---
+import Base from '../layouts/Base.astro';
+import EssayCard from '../components/EssayCard.astro';
+import { SITE, TOPICS } from '../config';
+import { getEssays, topicName } from '../lib/essays';
+import { readingLabel } from '../lib/format';
+
+const essays = await getEssays();
+const [featured, ...rest] = essays;
+const recent = rest.slice(0, 3);
+---
+
+<Base>
+  <div class="page">
+    <div class="row">
+      <section class="tile tile-dark tile-wide tile-intro">
+        <h1>शब्दांचं <span class="hl">छोटं घर</span>, मनातल्या गोष्टींसाठी.</h1>
+        <p>{SITE.introLine}</p>
+      </section>
+
+      <section class="tile tile-accent">
+        {
+          SITE.photo ? (
+            <img class="photo" src={SITE.photo} alt={SITE.author} width="108" height="108" />
+          ) : (
+            <div class="photo photo-placeholder">तुमचा<br />फोटो</div>
+          )
+        }
+        <h2>नमस्कार, मी {SITE.author}.</h2>
+        <p>{SITE.bio}</p>
+        <a href="/about/" class="more">अधिक वाचा →</a>
+      </section>
+    </div>
+
+    <div class="row">
+      {
+        featured && (
+          <article class="tile tile-butter tile-wide tile-feature">
+            <span class="kicker">
+              ताजा लेख · {topicName(featured.data.topic)} · {readingLabel(featured.body)}
+            </span>
+            <h2>
+              <a href={`/essays/${featured.id}/`}>{featured.data.title}</a>
+            </h2>
+            <p>{featured.data.description}</p>
+            <a href={`/essays/${featured.id}/`} class="btn">लेख वाचा →</a>
+          </article>
+        )
+      }
+      <section class="tile tile-mint tile-quote">
+        <p>“{SITE.quote}”</p>
+      </section>
+    </div>
+
+    {
+      recent.length > 0 && (
+        <div id="essays" class="row">
+          {recent.map((essay) => (
+            <EssayCard essay={essay} />
+          ))}
+        </div>
+      )
+    }
+
+    <div class="row">
+      <section id="topics" class="tile tile-dark" style="flex-basis: 360px;">
+        <h2>विषय</h2>
+        <div class="pill-row">
+          {TOPICS.map((t) => (
+            <a class="pill" href={`/topics/${t.slug}/`}>
+              {t.name}
+            </a>
+          ))}
+        </div>
+        <a href="/essays/" class="link-accent">सर्व लेख पाहा →</a>
+      </section>
+    </div>
+  </div>
+</Base>

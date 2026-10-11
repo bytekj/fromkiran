@@ -1,0 +1,28 @@
+---
+import Base from '../layouts/Base.astro';
+import { SITE } from '../config';
+---
+
+<Base title="माझ्याबद्दल" description={SITE.bio}>
+  <div class="page">
+    <div class="row">
+      <section class="tile tile-accent tile-wide" style="padding: clamp(28px, 4vw, 48px);">
+        {
+          SITE.photo ? (
+            <img class="photo" src={SITE.photo} alt={SITE.author} width="108" height="108" />
+          ) : (
+            <div class="photo photo-placeholder">तुमचा<br />फोटो</div>
+          )
+        }
+        <h1 style="font-weight: 700; font-size: clamp(32px, 4.4vw, 52px); line-height: 1.4;">
+          नमस्कार, मी {SITE.author}.
+        </h1>
+        <p style="font-size: 20px; line-height: 1.9; max-width: 640px;">{SITE.bio}</p>
+        <!-- Write more about yourself here. -->
+      </section>
+      <section class="tile tile-mint tile-quote">
+        <p>“{SITE.quote}”</p>
+      </section>
+    </div>
+  </div>
+</Base>

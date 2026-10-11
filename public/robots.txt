@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Change the domain below to your real one.
+Sitemap: https://fromkiran.com/sitemap-index.xml

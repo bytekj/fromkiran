@@ -1,0 +1,67 @@
+---
+import '../styles/global.css';
+import { SITE } from '../config';
+import { marathiNumber } from '../lib/format';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title, description = SITE.description } = Astro.props;
+const fullTitle = title ? `${title} · ${SITE.name}` : `${SITE.name} — ${SITE.tagline}`;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const year = marathiNumber(new Date().getFullYear());
+---
+
+<!doctype html>
+<html lang="mr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="alternate" type="application/rss+xml" title={SITE.name} href="/rss.xml" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content="mr_IN" />
+    <meta name="theme-color" content="#151515" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&amp;family=Hind:wght@400;500;600&amp;display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <header class="site-header wrap">
+      <a href="/" class="logo">{SITE.name}<span class="dot">●</span></a>
+      <nav class="site-nav" aria-label="मुख्य मेनू">
+        <a href="/essays/">लेख</a>
+        <a href="/#topics">विषय</a>
+        <a href="/about/">माझ्याबद्दल</a>
+      </nav>
+    </header>
+
+    <main class="wrap">
+      <slot />
+    </main>
+
+    <footer class="site-footer wrap">
+      <span>© {year} {SITE.name} · {SITE.author}</span>
+      <span class="links">
+        {SITE.instagram && <a href={SITE.instagram}>इंस्टाग्राम</a>}
+        {SITE.email && <a href={`mailto:${SITE.email}`}>ईमेल</a>}
+        <a href="/rss.xml">RSS</a>
+      </span>
+    </footer>
+  </body>
+</html>

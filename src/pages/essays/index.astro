@@ -1,0 +1,34 @@
+---
+import Base from '../../layouts/Base.astro';
+import EssayCard from '../../components/EssayCard.astro';
+import { TOPICS } from '../../config';
+import { getEssays } from '../../lib/essays';
+
+const essays = await getEssays();
+---
+
+<Base title="सर्व लेख" description="जीवनगाणे वरील सर्व लेख.">
+  <div class="page">
+    <h1 class="section-title" style="font-size: clamp(32px, 4.4vw, 48px);">सर्व लेख</h1>
+    <div class="pill-row">
+      {
+        TOPICS.map((t) => (
+          <a class="pill" href={`/topics/${t.slug}/`}>
+            {t.name}
+          </a>
+        ))
+      }
+    </div>
+    {
+      essays.length > 0 ? (
+        <div class="row">
+          {essays.map((essay) => (
+            <EssayCard essay={essay} />
+          ))}
+        </div>
+      ) : (
+        <p>अजून एकही लेख प्रकाशित झालेला नाही.</p>
+      )
+    }
+  </div>
+</Base>
