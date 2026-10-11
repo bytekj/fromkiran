@@ -1,30 +1,17 @@
 ---
 import Base from '../layouts/Base.astro';
 import EssayCard from '../components/EssayCard.astro';
-import { SITE, TOPICS } from '../config';
+import { SITE } from '../config';
 import { getEssays, topicName } from '../lib/essays';
 import { readingLabel } from '../lib/format';
 
 const essays = await getEssays();
 const [featured, ...rest] = essays;
-const recent = rest.slice(0, 3);
+const recent = rest;
 ---
 
 <Base>
   <div class="page">
-    <div class="row">
-      <section class="tile tile-accent" style="padding: clamp(28px, 4vw, 44px);">
-        <h2>नमस्कार, मी {SITE.author}.</h2>
-        <p>{SITE.bio}</p>
-        <a href="/about/" class="more">अधिक वाचा →</a>
-        {
-          SITE.photo && (
-            <img class="photo photo-icon" src={SITE.photo} alt={SITE.author} width="84" height="84" />
-          )
-        }
-      </section>
-    </div>
-
     <div class="row">
       {
         featured && (
@@ -40,6 +27,12 @@ const recent = rest.slice(0, 3);
           </article>
         )
       }
+      <section class="tile tile-accent tile-about">
+        <h2>नमस्कार, मी {SITE.author}.</h2>
+        <p>{SITE.bio}</p>
+        <a href="/about/" class="more">अधिक वाचा →</a>
+        {SITE.photo && <img class="about-photo" src={SITE.photo} alt={SITE.author} width="1000" height="1333" />}
+      </section>
     </div>
 
     {
@@ -52,18 +45,5 @@ const recent = rest.slice(0, 3);
       )
     }
 
-    <div class="row">
-      <section id="topics" class="tile tile-dark" style="flex-basis: 360px;">
-        <h2>विषय</h2>
-        <div class="pill-row">
-          {TOPICS.map((t) => (
-            <a class="pill" href={`/topics/${t.slug}/`}>
-              {t.name}
-            </a>
-          ))}
-        </div>
-        <a href="/essays/" class="link-accent">सर्व लेख पाहा →</a>
-      </section>
-    </div>
   </div>
 </Base>
