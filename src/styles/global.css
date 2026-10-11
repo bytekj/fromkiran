@@ -473,3 +473,18 @@ button:focus-visible {
 .essay-list .date {
   font-size: 15px;
 }
+
+/* ---------- home intro: small photo beside the intro line ---------- */
+
+.intro-foot {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.photo-icon {
+  flex: none;
+  width: 84px;
+  height: 84px;
+  border: 2px solid var(--accent);
+}

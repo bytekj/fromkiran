@@ -15,7 +15,12 @@ const recent = rest.slice(0, 3);
     <div class="row">
       <section class="tile tile-dark tile-wide tile-intro">
         <h1><span class="hl">{SITE.name}</span></h1>
-        <p>{SITE.introLine}</p>
+        <div class="intro-foot">
+          {SITE.photo && (
+            <img class="photo photo-icon" src={SITE.photo} alt={SITE.author} width="84" height="84" />
+          )}
+          <p>{SITE.introLine}</p>
+        </div>
       </section>
 
       <section class="tile tile-accent">
@@ -40,9 +45,6 @@ const recent = rest.slice(0, 3);
           </article>
         )
       }
-      <section class="tile tile-photo">
-        {SITE.photo && <img src={SITE.photo} alt={SITE.author} width="1000" height="1333" />}
-      </section>
     </div>
 
     {
