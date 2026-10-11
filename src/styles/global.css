@@ -486,5 +486,5 @@ button:focus-visible {
   flex: none;
   width: 84px;
   height: 84px;
-  border: 2px solid var(--accent);
+  border: 2px solid var(--ink);
 }
