@@ -3,7 +3,6 @@
 export const SITE = {
   name: 'जीवनगाणे',
   author: 'किरण',
-  tagline: 'शब्दांचं छोटं घर, मनातल्या गोष्टींसाठी.',
   description: 'किरणचा वैयक्तिक ब्लॉग — चिंतन, निरीक्षण आणि आठवणी, मराठीत.',
   introLine: 'किरणचा वैयक्तिक ब्लॉग — चिंतन, निरीक्षण आणि आठवणी, मराठीत.',
   quote: 'लिहिणं म्हणजे स्वतःशी चाललेला संवाद.',
@@ -11,7 +10,7 @@ export const SITE = {
 
   // Put your photo in the /public folder (for example /public/kiran.jpg)
   // and set this to '/kiran.jpg'. Leave empty to show a placeholder circle.
-  photo: '',
+  photo: '/kiran.jpg',
 
   // Footer links. Leave a value empty to hide that link.
   instagram: '',
@@ -20,6 +19,7 @@ export const SITE = {
 
 // Topics. `slug` is used in the web address and in each essay's front matter.
 export const TOPICS = [
+  { slug: 'manatlya-goshti', name: 'मनातल्या गोष्टी' },
   { slug: 'chintan', name: 'चिंतन' },
   { slug: 'nirikshan', name: 'निरीक्षण' },
   { slug: 'athavani', name: 'आठवणी' },
