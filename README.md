@@ -66,7 +66,7 @@ The project already contains `wrangler.jsonc`, which tells Cloudflare to serve t
 1. Create a free account at cloudflare.com and a free GitHub account.
 2. Upload this project to a new GitHub repository.
 3. In Cloudflare: **Workers & Pages → Create application → Import a repository** (Get started), pick your repository.
-4. Build command `npm run build`, deploy command `npx wrangler deploy`. The Worker name must match `name` in `wrangler.jsonc` (`jeewangane-blog`).
+4. Build command `npm run build`, deploy command `npx wrangler deploy`. The Worker name must match `name` in `wrangler.jsonc` (`fromkiran`).
 5. Click **Save and Deploy**. Every time you push a new essay to GitHub, the site updates by itself.
 6. Custom domain: open the Worker → **Settings → Domains & Routes → Add → Custom Domain**.
 
