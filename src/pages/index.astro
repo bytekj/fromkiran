@@ -19,13 +19,6 @@ const recent = rest.slice(0, 3);
       </section>
 
       <section class="tile tile-accent">
-        {
-          SITE.photo ? (
-            <img class="photo" src={SITE.photo} alt={SITE.author} width="108" height="108" />
-          ) : (
-            <div class="photo photo-placeholder">तुमचा<br />फोटो</div>
-          )
-        }
         <h2>नमस्कार, मी {SITE.author}.</h2>
         <p>{SITE.bio}</p>
         <a href="/about/" class="more">अधिक वाचा →</a>
@@ -47,8 +40,8 @@ const recent = rest.slice(0, 3);
           </article>
         )
       }
-      <section class="tile tile-mint tile-quote">
-        <p>“{SITE.quote}”</p>
+      <section class="tile tile-photo">
+        {SITE.photo && <img src={SITE.photo} alt={SITE.author} width="1000" height="1333" />}
       </section>
     </div>
 
