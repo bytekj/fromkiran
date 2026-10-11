@@ -1,5 +1,5 @@
 ---
-title: "जीवनगाणे २: दान कोणाला?"  
+title: "दान कोणाला?"  
 description: "दान कोणाला"
 pubDate: 2023-06-27
 topic: manatlya-goshti  
