@@ -1,5 +1,5 @@
 ---
-title: "जीवनगाणे ३: तिसरे सेमिस्टर"
+title: "तिसरे सेमिस्टर"
 description: "गीता आणि विवेक"
 pubDate: 2023-07-06
 topic: manatlya-goshti
