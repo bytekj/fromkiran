@@ -12,3 +12,19 @@ export async function getEssays(): Promise<Essay[]> {
 export function topicName(slug: string): string {
   return TOPICS.find((t) => t.slug === slug)?.name ?? slug;
 }
+
+/** Topics shown as small slips (poems) instead of envelopes. */
+const POEM_TOPICS = ['kavita', 'charoli'];
+
+export function isPoem(essay: Essay): boolean {
+  return POEM_TOPICS.includes(essay.data.topic);
+}
+
+/** First few non-empty lines of a poem. */
+export function poemLines(essay: Essay, max = 4): string[] {
+  return (essay.body ?? '')
+    .split('\n')
+    .map((l) => l.trim())
+    .filter(Boolean)
+    .slice(0, max);
+}

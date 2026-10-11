@@ -36,3 +36,13 @@ export function readingLabel(body: string | undefined): string {
   const n = readingMinutes(body);
   return `${marathiNumber(n)} ${n === 1 ? 'मिनिट' : 'मिनिटे'}`;
 }
+
+const SHORT_MONTHS = ['जाने.', 'फेब्रु.', 'मार्च', 'एप्रिल', 'मे', 'जून', 'जुलै', 'ऑगस्ट', 'सप्टें.', 'ऑक्टो.', 'नोव्हें.', 'डिसें.'];
+
+/** Date -> ["२६ जुलै", "२०२६"] for the postmark */
+export function postmarkParts(date: Date): [string, string] {
+  return [
+    `${marathiNumber(date.getUTCDate())} ${SHORT_MONTHS[date.getUTCMonth()]}`,
+    marathiNumber(date.getUTCFullYear()),
+  ];
+}

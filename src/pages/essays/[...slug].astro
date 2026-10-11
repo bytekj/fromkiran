@@ -23,6 +23,7 @@ const { title, description, pubDate, topic } = essay.data;
       <a href="/essays/" class="back-link">← सर्व लेख</a>
     </div>
     <article class="essay">
+      <div class="env-stripe essay-stripe"></div>
       <div class="meta">
         <a href={`/topics/${topic}/`}>{topicName(topic)}</a> · {formatDate(pubDate)} · {readingLabel(essay.body)} वाचन
       </div>

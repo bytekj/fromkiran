@@ -1,8 +1,9 @@
 ---
 import Base from '../../layouts/Base.astro';
 import EssayCard from '../../components/EssayCard.astro';
+import Slip from '../../components/Slip.astro';
 import { TOPICS } from '../../config';
-import { getEssays } from '../../lib/essays';
+import { getEssays, isPoem } from '../../lib/essays';
 
 const essays = await getEssays();
 ---
@@ -21,10 +22,10 @@ const essays = await getEssays();
     </div>
     {
       essays.length > 0 ? (
-        <div class="row">
-          {essays.map((essay) => (
-            <EssayCard essay={essay} />
-          ))}
+        <div class="envelope-grid">
+          {essays.map((essay, i) =>
+            isPoem(essay) ? <Slip essay={essay} index={i} /> : <EssayCard essay={essay} index={i} />
+          )}
         </div>
       ) : (
         <p>अजून एकही लेख प्रकाशित झालेला नाही.</p>

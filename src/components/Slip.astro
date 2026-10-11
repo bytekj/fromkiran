@@ -1,0 +1,21 @@
+---
+import type { Essay } from '../lib/essays';
+import { topicName, poemLines } from '../lib/essays';
+import { formatDate } from '../lib/format';
+
+interface Props {
+  essay: Essay;
+  index?: number;
+}
+
+const { essay, index = 0 } = Astro.props;
+const lines = poemLines(essay);
+---
+
+<article class={`slip tilt-${(index + 1) % 2 === 0 ? 1 : 4}`}>
+  <span class="slip-meta">{topicName(essay.data.topic)} · {formatDate(essay.data.pubDate)}</span>
+  <h3 class="slip-title"><a href={`/essays/${essay.id}/`}>{essay.data.title}</a></h3>
+  <p class="slip-text">
+    {lines.map((line, i) => (<>{i > 0 && <br />}{line}</>))}
+  </p>
+</article>

@@ -1,17 +1,26 @@
 ---
 import type { Essay } from '../lib/essays';
 import { topicName } from '../lib/essays';
-import { readingLabel } from '../lib/format';
+import { postmarkParts } from '../lib/format';
 
 interface Props {
   essay: Essay;
+  index?: number;
 }
 
-const { essay } = Astro.props;
+const { essay, index = 0 } = Astro.props;
+const [dayMonth, year] = postmarkParts(essay.data.pubDate);
 ---
 
-<a href={`/essays/${essay.id}/`} class="card">
-  <span class="meta">{topicName(essay.data.topic)} · {readingLabel(essay.body)}</span>
-  <span class="title">{essay.data.title}</span>
-  <span class="desc">{essay.data.description}</span>
-</a>
+<article class={`envelope env-${index % 3} tilt-${index % 6}`}>
+  <div class="env-stripe"></div>
+  <div class="env-body">
+    <div class="env-top">
+      <span class="env-postmark">{dayMonth}<br />{year}</span>
+      <span class="env-stamp">{topicName(essay.data.topic)}</span>
+    </div>
+    <h3 class="env-title"><a href={`/essays/${essay.id}/`}>{essay.data.title}</a></h3>
+    {essay.data.description && <p class="env-desc">{essay.data.description}</p>}
+    <a href={`/essays/${essay.id}/`} class="env-more">वाचा →</a>
+  </div>
+</article>

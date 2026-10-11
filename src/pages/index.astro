@@ -1,48 +1,99 @@
 ---
 import Base from '../layouts/Base.astro';
 import EssayCard from '../components/EssayCard.astro';
+import Slip from '../components/Slip.astro';
 import { SITE } from '../config';
-import { getEssays, topicName } from '../lib/essays';
-import { readingLabel } from '../lib/format';
+import { getEssays, isPoem, topicName } from '../lib/essays';
+import { formatDate, postmarkParts } from '../lib/format';
 
-const essays = await getEssays();
-const [featured, ...rest] = essays;
-const recent = rest;
+const all = await getEssays();
+const prose = all.filter((e) => !isPoem(e));
+const poems = all.filter(isPoem);
+const [latest, ...older] = prose;
+const [pmDay, pmYear] = latest ? postmarkParts(latest.data.pubDate) : ['', ''];
 ---
 
 <Base>
-  <div class="page">
-    <div class="row">
+  <div class="page home">
+    <section class="hero">
       {
-        featured && (
-          <article class="tile tile-butter tile-wide tile-feature">
-            <span class="kicker">
-              ताजा लेख · {topicName(featured.data.topic)} · {readingLabel(featured.body)}
-            </span>
-            <h2>
-              <a href={`/essays/${featured.id}/`}>{featured.data.title}</a>
-            </h2>
-            <p>{featured.data.description}</p>
-            <a href={`/essays/${featured.id}/`} class="btn">लेख वाचा →</a>
+        latest && (
+          <article class="postcard">
+            <div class="postcard-main">
+              <span class="kicker">
+                ताजे टपाल · {topicName(latest.data.topic)} · {formatDate(latest.data.pubDate)}
+              </span>
+              <h1>
+                <a href={`/essays/${latest.id}/`}>{latest.data.title}</a>
+              </h1>
+              {latest.data.description && <p>{latest.data.description}</p>}
+              <a href={`/essays/${latest.id}/`} class="btn">पत्र वाचा →</a>
+            </div>
+            <div class="postcard-rule" />
+            <div class="postcard-address">
+              <div class="pc-stamp">
+                <div class="pc-stamp-inner">
+                  <span class="pc-stamp-year">{pmYear}</span>
+                  <span class="pc-stamp-label">टपाल</span>
+                </div>
+              </div>
+              <div class="pc-postmark" aria-hidden="true">
+                <span>मुंबई</span>
+                <span class="pc-postmark-date">{pmDay}</span>
+                <span>{pmYear}</span>
+              </div>
+              <svg class="pc-waves" aria-hidden="true" width="120" height="44" viewBox="0 0 120 44" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                <path d="M2 8 Q 14 0 26 8 T 50 8 T 74 8 T 98 8 T 118 8" />
+                <path d="M2 18 Q 14 10 26 18 T 50 18 T 74 18 T 98 18 T 118 18" />
+                <path d="M2 28 Q 14 20 26 28 T 50 28 T 74 28 T 98 28 T 118 28" />
+                <path d="M2 38 Q 14 30 26 38 T 50 38 T 74 38 T 98 38 T 118 38" />
+              </svg>
+              <div class="pc-line">प्रति,</div>
+              <div class="pc-line">वाचक मित्र,</div>
+              <div class="pc-line">fromkiran.com</div>
+              <span class="pc-tag">{topicName(latest.data.topic)}</span>
+            </div>
           </article>
         )
       }
-      <section class="tile tile-accent tile-about">
+      <aside class="sender">
+        <span class="sender-tag">प्रेषक</span>
         <h2>नमस्कार, मी {SITE.author}.</h2>
         <p>{SITE.bio}</p>
         <a href="/about/" class="more">अधिक वाचा →</a>
-      </section>
-    </div>
+        <div class="sender-sign">— {SITE.author}, मुंबई</div>
+      </aside>
+    </section>
 
     {
-      recent.length > 0 && (
-        <div id="essays" class="row">
-          {recent.map((essay) => (
-            <EssayCard essay={essay} />
-          ))}
-        </div>
+      older.length > 0 && (
+        <section id="essays" class="home-section">
+          <div class="home-section-head">
+            <h2>आधीचं टपाल</h2>
+            <a href="/essays/" class="link-accent">सर्व लेख पाहा →</a>
+          </div>
+          <div class="envelope-grid">
+            {older.map((essay, i) => (
+              <EssayCard essay={essay} index={i} />
+            ))}
+          </div>
+        </section>
       )
     }
 
+    {
+      poems.length > 0 && (
+        <section class="home-section">
+          <div class="home-section-head">
+            <h2>चिठ्ठ्या</h2>
+          </div>
+          <div class="slip-row">
+            {poems.map((essay, i) => (
+              <Slip essay={essay} index={i} />
+            ))}
+          </div>
+        </section>
+      )
+    }
   </div>
 </Base>

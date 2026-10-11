@@ -1,8 +1,9 @@
 ---
 import Base from '../../layouts/Base.astro';
 import EssayCard from '../../components/EssayCard.astro';
+import Slip from '../../components/Slip.astro';
 import { TOPICS } from '../../config';
-import { getEssays } from '../../lib/essays';
+import { getEssays, isPoem } from '../../lib/essays';
 
 export function getStaticPaths() {
   return TOPICS.map((t) => ({ params: { topic: t.slug }, props: { name: t.name } }));
@@ -27,10 +28,10 @@ const essays = (await getEssays()).filter((e) => e.data.topic === topic);
     </div>
     {
       essays.length > 0 ? (
-        <div class="row">
-          {essays.map((essay) => (
-            <EssayCard essay={essay} />
-          ))}
+        <div class="envelope-grid">
+          {essays.map((essay, i) =>
+            isPoem(essay) ? <Slip essay={essay} index={i} /> : <EssayCard essay={essay} index={i} />
+          )}
         </div>
       ) : (
         <p>या विषयात अजून लेख नाहीत.</p>
