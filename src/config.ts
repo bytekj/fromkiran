@@ -8,10 +8,6 @@ export const SITE = {
   quote: 'लिहिणं म्हणजे स्वतःशी चाललेला संवाद.',
   bio: 'रोजच्या जगण्यातून सुचलेलं, भावलेलं आणि खटकलेलं मी इथे लिहितो. ही माझी वही — कधी विचार, कधी प्रश्न, कधी फक्त एक निरीक्षण.',
 
-  // Put your photo in the /public folder (for example /public/kiran.jpg)
-  // and set this to '/kiran.jpg'. Leave empty to show a placeholder circle.
-  photo: '/kiran.jpg',
-
   // Footer links. Leave a value empty to hide that link.
   instagram: '',
   email: '',

@@ -19,15 +19,6 @@ const essays = (await getEssays()).filter((e) => e.data.topic === TOPIC_SLUG);
         <p style="font-size: 20px; line-height: 1.9; max-width: 640px;">{SITE.bio}</p>
         <!-- Write more about yourself here. -->
       </section>
-      <section class="tile tile-photo">
-        {
-          SITE.photo ? (
-            <img src={SITE.photo} alt={SITE.author} width="1000" height="1333" />
-          ) : (
-            <div class="photo photo-placeholder">तुमचा<br />फोटो</div>
-          )
-        }
-      </section>
     </div>
 
     <section class="tile tile-mint" style="flex: none;">
