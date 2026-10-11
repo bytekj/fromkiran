@@ -21,4 +21,5 @@ export const TOPICS = [
   { slug: 'athavani', name: 'आठवणी' },
   { slug: 'shahar', name: 'शहर' },
   { slug: 'lekhanpravas', name: 'लेखनप्रवास' },
+  { slug: 'kavita', name: 'कविता' },
 ];
