@@ -28,7 +28,6 @@ const { title, description, pubDate, topic } = essay.data;
         <a href={`/topics/${topic}/`}>{topicName(topic)}</a> · {formatDate(pubDate)} · {readingLabel(essay.body)} वाचन
       </div>
       <h1>{title}</h1>
-      <p class="lead">{description}</p>
       <div class="prose">
         <Content />
       </div>
