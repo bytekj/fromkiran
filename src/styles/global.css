@@ -891,3 +891,246 @@ button:focus-visible {
   border-radius: 12px;
   box-shadow: none;
 }
+
+/* ---------- letter to the author (feedback form under each essay) ---------- */
+
+:root {
+  --green: #3fb97a;
+  --green-ink: #07200f;
+}
+
+.letter {
+  position: relative;
+  overflow: hidden;
+  max-width: 820px;
+  margin: 28px auto 0;
+  width: 100%;
+  padding: clamp(28px, 5vw, 48px);
+  border-radius: var(--radius-lg);
+  background: var(--tile);
+}
+
+.letter-stripe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+.letter h2 {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.letter-sub {
+  color: var(--muted);
+  font-size: 16px;
+  margin-bottom: 22px;
+}
+
+.letter label,
+.letter-label {
+  display: block;
+  margin: 0 0 4px;
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.letter-opt {
+  color: #8f8a88;
+  font-size: 13px;
+}
+
+.letter input[type='text'],
+.letter input[type='email'],
+.letter textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #3a3a3f;
+  border-radius: 14px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+.letter textarea {
+  min-height: 150px;
+  resize: vertical;
+  line-height: 1.7;
+}
+
+.letter input:focus,
+.letter textarea:focus {
+  outline: 2px solid var(--butter);
+  outline-offset: 1px;
+  border-color: var(--butter);
+}
+
+.letter-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.letter-err {
+  min-height: 20px;
+  margin-top: 4px;
+  color: var(--accent);
+  font-size: 14px;
+}
+
+.letter-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.letter-count {
+  white-space: nowrap;
+  margin-top: 4px;
+}
+
+.letter-label {
+  margin-top: 8px;
+}
+
+.letter-stamps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 6px 0 18px;
+}
+
+.letter-stamp {
+  padding: 5px 14px;
+  border: 1.5px dashed #6b6b70;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.letter-stamp:hover {
+  border-color: var(--butter);
+  color: var(--text);
+}
+
+.letter-stamp[aria-pressed='true'] {
+  border: 1.5px solid var(--butter);
+  background: var(--butter);
+  color: var(--ink);
+}
+
+.letter-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.letter-send {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--mint);
+  color: var(--green-ink);
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s, transform 0.1s;
+}
+
+.letter-send:hover,
+.letter-send:focus-visible {
+  background: var(--green);
+  color: var(--green-ink);
+}
+
+.letter-send:active {
+  transform: scale(0.98);
+}
+
+.letter-send.is-busy {
+  opacity: 0.7;
+  cursor: progress;
+}
+
+.letter-err-form {
+  text-align: right;
+  margin: 0 0 8px;
+}
+
+.letter-priv {
+  margin-top: 14px;
+  color: #8f8a88;
+  font-size: 14px;
+}
+
+/* honeypot: invisible to people, tempting to bots */
+.letter-hp {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.letter-done {
+  text-align: center;
+  padding: 8px 0 4px;
+}
+
+.letter-done[hidden],
+.letter-form-view[hidden] {
+  display: none;
+}
+
+.letter-postmark {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 124px;
+  height: 124px;
+  margin: 6px auto 16px;
+  border: 2.5px solid var(--green);
+  border-radius: 50%;
+  color: var(--green);
+  font-family: 'Kalam', var(--font-body);
+  line-height: 1.2;
+  transform: rotate(-8deg);
+}
+
+.letter-postmark b {
+  font-size: 19px;
+}
+
+.letter-postmark span {
+  font-size: 12px;
+}
+
+.letter-again {
+  margin-top: 8px;
+  padding: 6px 18px;
+  border: 1px solid #3a3a3f;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.letter-again:hover {
+  border-color: var(--muted);
+  color: var(--text);
+}

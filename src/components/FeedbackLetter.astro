@@ -1,0 +1,187 @@
+---
+// "लेखकाला पत्र लिहा" — private feedback form shown under each essay.
+interface Props {
+  slug: string;
+  title: string;
+}
+const { slug, title } = Astro.props;
+---
+
+<section class="letter" aria-labelledby="letter-heading" data-slug={slug} data-title={title}>
+  <div class="env-stripe letter-stripe" aria-hidden="true"></div>
+
+  <div class="letter-form-view">
+    <h2 id="letter-heading">लेखकाला पत्र लिहा</h2>
+    <p class="letter-sub">हा लेख वाचून काय वाटलं? तुमचं पत्र फक्त मला दिसेल, इथे प्रसिद्ध होणार नाही.</p>
+
+    <form class="letter-form" novalidate>
+      <div class="letter-row">
+        <div>
+          <label for="letter-name">नाव</label>
+          <input type="text" id="letter-name" name="name" autocomplete="name" maxlength="80" placeholder="तुमचं नाव" />
+          <div class="letter-err" data-err="name" role="alert"></div>
+        </div>
+        <div>
+          <label for="letter-email">ईमेल <span class="letter-opt">(ऐच्छिक, उत्तर हवं असेल तरच)</span></label>
+          <input type="email" id="letter-email" name="email" autocomplete="email" maxlength="254" placeholder="name@example.com" />
+          <div class="letter-err" data-err="email" role="alert"></div>
+        </div>
+      </div>
+
+      <label for="letter-message">तुमचं पत्र</label>
+      <textarea id="letter-message" name="message" maxlength="2000" placeholder="मराठी किंवा इंग्रजीत लिहा…"></textarea>
+      <div class="letter-foot">
+        <div class="letter-err" data-err="message" role="alert"></div>
+        <span class="letter-opt letter-count" data-count>०</span>
+      </div>
+
+      <div class="letter-label">लेख कसा वाटला? <span class="letter-opt">(ऐच्छिक)</span></div>
+      <div class="letter-stamps" role="group" aria-label="लेख कसा वाटला?">
+        <button type="button" class="letter-stamp" data-reaction="bhavlay" aria-pressed="false">भावलं</button>
+        <button type="button" class="letter-stamp" data-reaction="patlay" aria-pressed="false">पटलं</button>
+        <button type="button" class="letter-stamp" data-reaction="vichar" aria-pressed="false">विचार करायला लावलं</button>
+      </div>
+
+      <div class="letter-hp" aria-hidden="true">
+        <label for="letter-website">Website</label>
+        <input type="text" id="letter-website" name="website" tabindex="-1" autocomplete="off" />
+      </div>
+
+      <div class="letter-err letter-err-form" data-err="form" role="alert"></div>
+      <div class="letter-actions">
+        <button type="submit" class="letter-send">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M4 20h4L19.5 8.5a2.1 2.1 0 0 0-3-3L5 17l-1 3z"></path>
+            <path d="M14.5 7.5l3 3"></path>
+          </svg>
+          <span>पत्र पाठवा</span>
+        </button>
+      </div>
+      <p class="letter-priv">नाव आणि ईमेल फक्त पत्र वाचण्यासाठी आणि उत्तर देण्यासाठी वापरले जातात. ते कुठेही दाखवले जात नाहीत.</p>
+    </form>
+  </div>
+
+  <div class="letter-done" hidden>
+    <div class="letter-postmark" aria-hidden="true"><b>पत्र पोहोचले</b><span data-date></span></div>
+    <h2>धन्यवाद, <span data-who></span></h2>
+    <p class="letter-sub" data-done-msg></p>
+    <button type="button" class="letter-again">आणखी एक पत्र लिहा</button>
+  </div>
+</section>
+
+<script>
+  const root = document.querySelector<HTMLElement>('.letter');
+  if (root) {
+    const form = root.querySelector<HTMLFormElement>('.letter-form')!;
+    const formView = root.querySelector<HTMLElement>('.letter-form-view')!;
+    const done = root.querySelector<HTMLElement>('.letter-done')!;
+    const sendBtn = root.querySelector<HTMLButtonElement>('.letter-send')!;
+    const sendLabel = sendBtn.querySelector('span')!;
+    const msg = root.querySelector<HTMLTextAreaElement>('#letter-message')!;
+    const count = root.querySelector<HTMLElement>('[data-count]')!;
+    const stamps = [...root.querySelectorAll<HTMLButtonElement>('.letter-stamp')];
+    const shownAt = Date.now();
+    let busy = false;
+
+    const digits = '०१२३४५६७८९';
+    const mr = (n: number) => String(n).replace(/\d/g, (d) => digits[Number(d)]);
+    const setErr = (key: string, text: string) => {
+      const el = root.querySelector<HTMLElement>(`[data-err="${key}"]`);
+      if (el) el.textContent = text;
+    };
+    const clearErrs = () => root.querySelectorAll<HTMLElement>('[data-err]').forEach((e) => (e.textContent = ''));
+
+    const updateCount = () => (count.textContent = `${mr(msg.value.length)} / ${mr(2000)}`);
+    updateCount();
+    msg.addEventListener('input', () => {
+      updateCount();
+      setErr('message', '');
+    });
+    root.querySelector('#letter-name')!.addEventListener('input', () => setErr('name', ''));
+    root.querySelector('#letter-email')!.addEventListener('input', () => setErr('email', ''));
+
+    stamps.forEach((b) =>
+      b.addEventListener('click', () => {
+        const wasOn = b.getAttribute('aria-pressed') === 'true';
+        stamps.forEach((x) => x.setAttribute('aria-pressed', 'false'));
+        b.setAttribute('aria-pressed', wasOn ? 'false' : 'true');
+      }),
+    );
+
+    form.addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      if (busy) return;
+      clearErrs();
+      const data = new FormData(form);
+      const name = String(data.get('name') ?? '').trim();
+      const email = String(data.get('email') ?? '').trim();
+      const message = String(data.get('message') ?? '').trim();
+
+      let ok = true;
+      if (!name) (setErr('name', 'तुमचं नाव लिहा'), (ok = false));
+      if (email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) (setErr('email', 'ईमेल बरोबर लिहा'), (ok = false));
+      if (message.length < 5) (setErr('message', 'पत्रात थोडं तरी लिहा'), (ok = false));
+      if (!ok) return;
+
+      busy = true;
+      sendBtn.classList.add('is-busy');
+      sendLabel.textContent = 'पाठवत आहे…';
+      const reaction = stamps.find((s) => s.getAttribute('aria-pressed') === 'true')?.dataset.reaction ?? '';
+
+      try {
+        const res = await fetch('/api/feedback', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({
+            slug: root.dataset.slug,
+            title: root.dataset.title,
+            name,
+            email,
+            message,
+            reaction,
+            website: String(data.get('website') ?? ''),
+            elapsed: Date.now() - shownAt,
+          }),
+        });
+        const out = await res.json().catch(() => ({}));
+        if (res.ok && out.ok) {
+          root.querySelector('[data-who]')!.textContent = name;
+          root.querySelector('[data-date]')!.textContent = new Date().toLocaleDateString('mr-IN', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric',
+          });
+          root.querySelector('[data-done-msg]')!.textContent = email
+            ? 'तुमचं पत्र मला मिळालं. उत्तर द्यायचं असेल तर मी तुमच्या ईमेलवर लिहीन.'
+            : 'तुमचं पत्र मला मिळालं. वाचून आनंद झाला.';
+          formView.hidden = true;
+          done.hidden = false;
+          done.querySelector('h2')?.setAttribute('tabindex', '-1');
+          (done.querySelector('h2') as HTMLElement | null)?.focus();
+        } else if (res.status === 429) {
+          setErr('form', 'आज खूप पत्रं पाठवली गेली आहेत. थोड्या वेळाने पुन्हा प्रयत्न करा.');
+        } else if (res.status === 400 && out.fields) {
+          if (out.fields.name) setErr('name', 'तुमचं नाव लिहा');
+          if (out.fields.email) setErr('email', 'ईमेल बरोबर लिहा');
+          if (out.fields.message) setErr('message', 'पत्रात थोडं तरी लिहा');
+        } else {
+          setErr('form', 'पत्र पाठवता आलं नाही. थोड्या वेळाने पुन्हा प्रयत्न करा.');
+        }
+      } catch {
+        setErr('form', 'इंटरनेट जोडणी तपासा आणि पुन्हा प्रयत्न करा.');
+      } finally {
+        busy = false;
+        sendBtn.classList.remove('is-busy');
+        sendLabel.textContent = 'पत्र पाठवा';
+      }
+    });
+
+    root.querySelector('.letter-again')!.addEventListener('click', () => {
+      form.reset();
+      updateCount();
+      stamps.forEach((x) => x.setAttribute('aria-pressed', 'false'));
+      done.hidden = true;
+      formView.hidden = false;
+    });
+  }
+</script>

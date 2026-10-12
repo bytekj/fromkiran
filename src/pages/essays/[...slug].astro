@@ -1,6 +1,7 @@
 ---
 import { render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
+import FeedbackLetter from '../../components/FeedbackLetter.astro';
 import { getEssays, topicName } from '../../lib/essays';
 import { formatDate, readingLabel } from '../../lib/format';
 
@@ -32,5 +33,6 @@ const { title, description, pubDate, topic } = essay.data;
         <Content />
       </div>
     </article>
+    <FeedbackLetter slug={essay.id} title={title} />
   </div>
 </Base>

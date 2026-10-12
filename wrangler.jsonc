@@ -1,9 +1,34 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "fromkiran",
+  "main": "src/worker.js",
   "compatibility_date": "2026-10-01",
   "assets": {
     "directory": "./dist",
-    "not_found_handling": "404-page"
+    "binding": "ASSETS",
+    "not_found_handling": "404-page",
+    // Only /api/* goes through the Worker; every page is still served straight from the static files.
+    "run_worker_first": ["/api/*"]
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "fromkiran-letters",
+      "database_id": "a37f48ea-04c7-405d-b626-b5ec5a025d73"
+    }
+  ],
+  // Letters are emailed to the author only. To also send readers a copy later,
+  // remove destination_address (and keep allowed_sender_addresses).
+  "send_email": [
+    {
+      "name": "EMAIL",
+      "destination_address": "khaladkar.kiran@gmail.com",
+      "allowed_sender_addresses": ["letters@fromkiran.com"]
+    }
+  ],
+  "vars": {
+    "NOTIFY_TO": "khaladkar.kiran@gmail.com",
+    "MAIL_FROM": "letters@fromkiran.com",
+    "SITE_ORIGINS": "https://fromkiran.com,https://www.fromkiran.com"
   }
 }
