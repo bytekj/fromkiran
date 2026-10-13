@@ -34,6 +34,7 @@ async function sha256Hex(text) {
 function originAllowed(request, env) {
   const origin = request.headers.get('origin');
   if (!origin) return true; // same-origin form posts from some browsers omit it
+  if (origin === new URL(request.url).origin) return true; // the site posting to itself (also covers preview URLs)
   const allowed = (env.SITE_ORIGINS || '').split(',').map((s) => s.trim()).filter(Boolean);
   if (allowed.includes(origin)) return true;
   const { hostname } = new URL(origin);
