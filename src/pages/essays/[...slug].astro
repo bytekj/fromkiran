@@ -18,7 +18,7 @@ const { Content } = await render(essay);
 const { title, description, pubDate, topic } = essay.data;
 ---
 
-<Base title={title} description={description}>
+<Base title={title} description={description} stickyTitle={title}>
   <div class="page">
     <div>
       <a href="/essays/" class="back-link">← सर्व लेख</a>

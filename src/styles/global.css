@@ -386,6 +386,56 @@ button:focus-visible {
   font-size: 16px;
 }
 
+/* ---------- title bar (appears on essay pages after the title scrolls away) ---------- */
+
+.title-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 max(24px, calc((100% - 712px) / 2));
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+  transform: translateY(-100%);
+  visibility: hidden;
+  transition: transform 0.18s ease, visibility 0.18s;
+}
+
+.title-bar.on {
+  transform: none;
+  visibility: visible;
+}
+
+.title-bar-site {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 18px;
+  white-space: nowrap;
+}
+
+.title-bar-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: right;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 18px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .title-bar {
+    transition: none;
+  }
+}
+
 /* ---------- about ---------- */
 
 .about h1 {

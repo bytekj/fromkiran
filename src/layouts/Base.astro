@@ -6,9 +6,10 @@ import { marathiNumber } from '../lib/format';
 interface Props {
   title?: string;
   description?: string;
+  stickyTitle?: string;
 }
 
-const { title, description = SITE.description } = Astro.props;
+const { title, description = SITE.description, stickyTitle } = Astro.props;
 const fullTitle = title ? `${title} · ${SITE.name}` : SITE.name;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const year = marathiNumber(new Date().getFullYear());
@@ -42,6 +43,14 @@ const year = marathiNumber(new Date().getFullYear());
     />
   </head>
   <body>
+    {
+      stickyTitle && (
+        <div class="title-bar" id="title-bar" aria-hidden="true">
+          <a href="/" class="title-bar-site" tabindex="-1">{SITE.name}</a>
+          <span class="title-bar-title">{stickyTitle}</span>
+        </div>
+      )
+    }
     <header class="site-header wrap">
       <a href="/" class="logo">{SITE.name}<span class="dot">.</span></a>
       <nav class="site-nav" aria-label="मुख्य मेनू">
@@ -62,5 +71,20 @@ const year = marathiNumber(new Date().getFullYear());
         <a href="/rss.xml">RSS</a>
       </span>
     </footer>
+    {
+      stickyTitle && (
+        <script is:inline>
+          (function () {
+            var bar = document.getElementById('title-bar');
+            var h = document.querySelector('.essay h1');
+            if (!bar || !h || !('IntersectionObserver' in window)) return;
+            new IntersectionObserver(function (e) {
+              var gone = !e[0].isIntersecting && e[0].boundingClientRect.top < 0;
+              bar.classList.toggle('on', gone);
+            }).observe(h);
+          })();
+        </script>
+      )
+    }
   </body>
 </html>
