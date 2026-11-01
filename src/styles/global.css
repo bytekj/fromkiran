@@ -397,6 +397,7 @@ button:focus-visible {
   height: 56px;
   display: flex;
   align-items: center;
+  flex-direction: row-reverse;
   justify-content: space-between;
   gap: 16px;
   padding: 0 max(24px, calc((100% - 712px) / 2));
@@ -424,7 +425,7 @@ button:focus-visible {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  text-align: right;
+  text-align: left;
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 18px;
