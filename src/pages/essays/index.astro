@@ -10,7 +10,7 @@ const essays = await getEssays();
 
 <Base title="सर्व लेख" description="जीवनगाणे वरील सर्व लेख.">
   <div class="page">
-    <h1 class="section-title" style="font-size: clamp(32px, 4.4vw, 48px);">सर्व लेख</h1>
+    <h1 class="section-title">सर्व लेख</h1>
     <div class="pill-row">
       {
         TOPICS.map((t) => (
@@ -22,7 +22,7 @@ const essays = await getEssays();
     </div>
     {
       essays.length > 0 ? (
-        <div class="envelope-grid">
+        <div class="entry-list">
           {essays.map((essay, i) =>
             isPoem(essay) ? <Slip essay={essay} index={i} /> : <EssayCard essay={essay} index={i} />
           )}

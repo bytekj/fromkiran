@@ -10,31 +10,31 @@ const essays = (await getEssays()).filter((e) => e.data.topic === TOPIC_SLUG);
 ---
 
 <Base title="माझ्याबद्दल" description={SITE.bio}>
-  <div class="page">
-    <div class="row">
-      <section class="tile tile-accent tile-wide" style="padding: clamp(28px, 4vw, 48px);">
-        <h1 style="font-weight: 700; font-size: clamp(32px, 4.4vw, 52px); line-height: 1.4;">
-          नमस्कार, मी {SITE.author}.
-        </h1>
-        <p style="font-size: 20px; line-height: 1.9; max-width: 640px;">{SITE.bio}</p>
-        <!-- Write more about yourself here. -->
-      </section>
-    </div>
+  <div class="page about">
+    <section>
+      <h1>नमस्कार, मी {SITE.author}.</h1>
+      <p class="about-bio">{SITE.bio}</p>
+      <!-- Write more about yourself here. -->
+    </section>
 
-    <section class="tile tile-mint" style="flex: none;">
-      <h2>
-        <a href={`/topics/${TOPIC_SLUG}/`}>{topicName}</a>
-      </h2>
+    <section>
+      <div class="home-section-head">
+        <h2>
+          <a href={`/topics/${TOPIC_SLUG}/`}>{topicName}</a>
+        </h2>
+      </div>
       {
         essays.length > 0 ? (
-          <ul class="essay-list">
+          <div class="entry-list">
             {essays.map((essay) => (
-              <li>
-                <a href={`/essays/${essay.id}/`}>{essay.data.title}</a>
-                <span class="date">{formatDate(essay.data.pubDate)}</span>
-              </li>
+              <article class="entry">
+                <span class="entry-date">{formatDate(essay.data.pubDate)}</span>
+                <h3 class="entry-title">
+                  <a href={`/essays/${essay.id}/`}>{essay.data.title}</a>
+                </h3>
+              </article>
             ))}
-          </ul>
+          </div>
         ) : (
           <p>अजून लेख नाहीत.</p>
         )

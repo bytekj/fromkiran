@@ -8,14 +8,17 @@ interface Props {
   index?: number;
 }
 
-const { essay, index = 0 } = Astro.props;
+const { essay } = Astro.props;
 const lines = poemLines(essay);
 ---
 
-<article class={`slip tilt-${(index + 1) % 2 === 0 ? 1 : 4}`}>
-  <span class="slip-meta">{topicName(essay.data.topic)} · {formatDate(essay.data.pubDate)}</span>
-  <h3 class="slip-title"><a href={`/essays/${essay.id}/`}>{essay.data.title}</a></h3>
-  <p class="slip-text">
-    {lines.map((line, i) => (<>{i > 0 && <br />}{line}</>))}
-  </p>
+<article class="entry">
+  <span class="entry-date">{formatDate(essay.data.pubDate)}</span>
+  <div>
+    <h3 class="entry-title"><a href={`/essays/${essay.id}/`}>{essay.data.title}</a></h3>
+    <p class="poem-text">
+      {lines.map((line, i) => (<>{i > 0 && <br />}{line}</>))}
+    </p>
+    <span class="entry-topic">{topicName(essay.data.topic)}</span>
+  </div>
 </article>
