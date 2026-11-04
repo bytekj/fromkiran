@@ -155,28 +155,69 @@ const { lang = 'mr-IN' } = Astro.props;
       ui();
     }
 
+    var plain = false; // true after a failure: let the browser choose its own voice
+
     function speakFrom(i) {
-      synth.cancel();
       token++;
       var mine = token;
       index = i;
       if (index >= chunks.length) { finish(); return; }
-      var c = chunks[index];
-      var u = new SpeechSynthesisUtterance(c.text);
-      u.lang = voice ? voice.lang : LANG;
-      if (voice) u.voice = voice;
-      u.rate = SPEEDS[speedIdx];
-      u.onstart = function () { if (mine === token) mark(c.el); };
-      u.onend = function () { if (mine === token && state === 'playing') speakFrom(index + 1); };
-      u.onerror = function (e) {
-        if (mine !== token) return;
-        if (e && (e.error === 'interrupted' || e.error === 'canceled')) return;
-        finish();
-        note.textContent = 'या ब्राउझरमध्ये वाचन सुरू होऊ शकलं नाही.';
-      };
+      // Chrome can silently drop speech that starts in the same instant as a cancel(),
+      // so cancel first and give it a moment before speaking.
+      if (synth.speaking || synth.pending || synth.paused) synth.cancel();
       state = 'playing';
       ui();
-      synth.speak(u);
+      setTimeout(function () {
+        if (mine !== token) return;
+        var c = chunks[index];
+        var started = false;
+        var u = new SpeechSynthesisUtterance(c.text);
+        u.lang = plain ? LANG : voice ? voice.lang : LANG;
+        if (voice && !plain) u.voice = voice;
+        u.rate = SPEEDS[speedIdx];
+        // keep a reference so the browser does not garbage-collect it mid-speech
+        window.__listenUtterance = u;
+
+        var watchdog = setTimeout(function () {
+          if (mine !== token || started) return;
+          if (!plain) {
+            // nothing was heard: retry once with the browser's own default voice
+            plain = true;
+            note.textContent = 'निवडलेला आवाज चालला नाही; डीफॉल्ट आवाज वापरत आहे.';
+            speakFrom(index);
+          } else {
+            synth.cancel();
+            finish();
+            note.textContent = 'या उपकरणावर वाचन सुरू होऊ शकलं नाही. कृपया फोनचा आवाज आणि सायलेंट मोड तपासा, किंवा दुसरा ब्राउझर वापरून पहा.';
+          }
+        }, 5000);
+
+        u.onstart = function () {
+          started = true;
+          clearTimeout(watchdog);
+          if (mine === token) mark(c.el);
+        };
+        u.onend = function () {
+          clearTimeout(watchdog);
+          if (mine === token && state === 'playing') speakFrom(index + 1);
+        };
+        u.onerror = function (e) {
+          clearTimeout(watchdog);
+          if (mine !== token) return;
+          var code = e && e.error;
+          if (code === 'interrupted' || code === 'canceled') return;
+          if (!plain && code !== 'not-allowed') {
+            plain = true;
+            speakFrom(index);
+            return;
+          }
+          finish();
+          note.textContent = 'वाचन सुरू होऊ शकलं नाही' + (code ? ' (' + code + ')' : '') + '.';
+        };
+        synth.speak(u);
+        // some Android/Chrome versions start in a "paused" state; nudge it
+        if (synth.paused) synth.resume();
+      }, 80);
     }
 
     function start() {
