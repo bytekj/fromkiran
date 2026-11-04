@@ -1,0 +1,265 @@
+---
+// "ऐका" — reads an essay aloud using the reader's own browser voice (Web Speech API).
+// The text is taken from the page itself, so edits to an essay are picked up automatically.
+interface Props {
+  lang?: string; // BCP-47 code of the essay text, e.g. 'mr-IN'. Use 'en-IN' for translated posts.
+}
+const { lang = 'mr-IN' } = Astro.props;
+---
+
+<div class="listen" data-listen data-lang={lang} hidden>
+  <div class="listen-bar">
+    <button type="button" class="listen-main" data-act="toggle" aria-label="लेख ऐका">
+      <svg class="ic ic-play" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M4 10v4h4l5 4V6L8 10H4z"></path>
+        <path d="M16.5 9a4 4 0 0 1 0 6"></path>
+        <path d="M19 6.5a7.5 7.5 0 0 1 0 11"></path>
+      </svg>
+      <svg class="ic ic-pause" viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true" hidden>
+        <rect x="6" y="5" width="4" height="14" rx="1"></rect>
+        <rect x="14" y="5" width="4" height="14" rx="1"></rect>
+      </svg>
+      <span data-label>ऐका</span>
+    </button>
+    <button type="button" class="listen-aux" data-act="stop" aria-label="वाचन बंद करा" hidden>
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"></rect></svg>
+    </button>
+    <button type="button" class="listen-aux listen-speed" data-act="speed" aria-label="वाचनाचा वेग" hidden>1×</button>
+  </div>
+  <p class="listen-note" data-note role="status"></p>
+</div>
+
+<script is:inline>
+  (function () {
+    var root = document.querySelector('[data-listen]');
+    var synth = window.speechSynthesis;
+    if (!root || !synth || typeof SpeechSynthesisUtterance === 'undefined') return;
+    root.hidden = false;
+
+    var article = document.querySelector('.essay');
+    var heading = article && article.querySelector('h1');
+    var prose = article && article.querySelector('.prose');
+    if (!prose) return;
+
+    var mainBtn = root.querySelector('[data-act="toggle"]');
+    var stopBtn = root.querySelector('[data-act="stop"]');
+    var speedBtn = root.querySelector('[data-act="speed"]');
+    var label = root.querySelector('[data-label]');
+    var icPlay = root.querySelector('.ic-play');
+    var icPause = root.querySelector('.ic-pause');
+    var note = root.querySelector('[data-note]');
+
+    var LANG = root.getAttribute('data-lang') || 'mr-IN';
+    var SPEEDS = [1, 1.25, 0.85];
+    var speedIdx = 0;
+    try {
+      var saved = parseFloat(localStorage.getItem('listen-rate'));
+      var found = SPEEDS.indexOf(saved);
+      if (found > -1) speedIdx = found;
+    } catch (e) {}
+
+    var chunks = []; // { text, el }
+    var index = 0;
+    var state = 'idle'; // idle | playing | paused
+    var token = 0; // bumped on every (re)start so late callbacks from cancelled speech are ignored
+    var voice = null;
+    var current = null;
+
+    function pickVoice() {
+      var all = synth.getVoices() || [];
+      var base = LANG.split('-')[0].toLowerCase();
+      function norm(v) { return (v.lang || '').replace('_', '-').toLowerCase(); }
+      var exact = all.filter(function (v) { return norm(v) === LANG.toLowerCase(); });
+      var same = all.filter(function (v) { return norm(v).indexOf(base) === 0; });
+      voice = exact[0] || same[0] || null;
+      // Marathi is written in Devanagari; a Hindi voice can read it if there is no Marathi voice.
+      if (!voice && base === 'mr') {
+        voice = all.filter(function (v) { return norm(v).indexOf('hi') === 0; })[0] || null;
+        voice && (voice.__fallback = true);
+      }
+    }
+    pickVoice();
+    if (synth.addEventListener) synth.addEventListener('voiceschanged', pickVoice);
+
+    function splitLong(text) {
+      // keep every spoken piece short: some browsers cut off long utterances
+      var parts = text.match(/[^।.?!…]+[।.?!…]*/g) || [text];
+      var out = [];
+      parts.forEach(function (p) {
+        p = p.trim();
+        if (!p) return;
+        while (p.length > 220) {
+          var cut = p.lastIndexOf(',', 220);
+          if (cut < 80) cut = p.lastIndexOf(' ', 220);
+          if (cut < 80) cut = 220;
+          out.push(p.slice(0, cut + 1).trim());
+          p = p.slice(cut + 1).trim();
+        }
+        if (p) out.push(p);
+      });
+      return out;
+    }
+
+    function collect() {
+      chunks = [];
+      function add(el) {
+        var t = (el.textContent || '').replace(/\s+/g, ' ').trim();
+        if (!t) return;
+        splitLong(t).forEach(function (s) { chunks.push({ text: s, el: el }); });
+      }
+      if (heading) add(heading);
+      Array.prototype.forEach.call(prose.children, function (el) {
+        var tag = el.tagName;
+        if (tag === 'UL' || tag === 'OL') {
+          Array.prototype.forEach.call(el.querySelectorAll('li'), add);
+        } else if (tag === 'HR' || tag === 'IMG' || tag === 'FIGURE' || tag === 'PRE' || tag === 'STYLE' || tag === 'SCRIPT') {
+          return;
+        } else {
+          add(el);
+        }
+      });
+    }
+
+    function mark(el) {
+      if (current === el) return;
+      if (current) current.classList.remove('is-reading');
+      current = el;
+      if (!el) return;
+      el.classList.add('is-reading');
+      var r = el.getBoundingClientRect();
+      var vh = window.innerHeight || document.documentElement.clientHeight;
+      if (r.top < 80 || r.bottom > vh - 80) {
+        var calm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        el.scrollIntoView({ block: 'center', behavior: calm ? 'auto' : 'smooth' });
+      }
+    }
+
+    function ui() {
+      var playing = state === 'playing';
+      var active = state !== 'idle';
+      icPlay.hidden = playing;
+      icPause.hidden = !playing;
+      label.textContent = playing ? 'थांबवा' : state === 'paused' ? 'पुन्हा सुरू करा' : 'ऐका';
+      mainBtn.setAttribute('aria-label', playing ? 'वाचन थांबवा' : state === 'paused' ? 'वाचन पुन्हा सुरू करा' : 'लेख ऐका');
+      stopBtn.hidden = !active;
+      speedBtn.hidden = !active;
+      speedBtn.textContent = SPEEDS[speedIdx] + '×';
+      root.classList.toggle('is-active', active);
+    }
+
+    function finish() {
+      token++;
+      state = 'idle';
+      index = 0;
+      mark(null);
+      ui();
+    }
+
+    var plain = false; // true after a failure: let the browser choose its own voice
+
+    function speakFrom(i) {
+      token++;
+      var mine = token;
+      index = i;
+      if (index >= chunks.length) { finish(); return; }
+      // Chrome can silently drop speech that starts in the same instant as a cancel(),
+      // so cancel first and give it a moment before speaking.
+      if (synth.speaking || synth.pending || synth.paused) synth.cancel();
+      state = 'playing';
+      ui();
+      setTimeout(function () {
+        if (mine !== token) return;
+        var c = chunks[index];
+        var started = false;
+        var u = new SpeechSynthesisUtterance(c.text);
+        u.lang = plain ? LANG : voice ? voice.lang : LANG;
+        if (voice && !plain) u.voice = voice;
+        u.rate = SPEEDS[speedIdx];
+        // keep a reference so the browser does not garbage-collect it mid-speech
+        window.__listenUtterance = u;
+
+        var watchdog = setTimeout(function () {
+          if (mine !== token || started) return;
+          if (!plain) {
+            // nothing was heard: retry once with the browser's own default voice
+            plain = true;
+            note.textContent = 'निवडलेला आवाज चालला नाही; डीफॉल्ट आवाज वापरत आहे.';
+            speakFrom(index);
+          } else {
+            synth.cancel();
+            finish();
+            note.textContent = 'या उपकरणावर वाचन सुरू होऊ शकलं नाही. कृपया फोनचा आवाज आणि सायलेंट मोड तपासा, किंवा दुसरा ब्राउझर वापरून पहा.';
+          }
+        }, 5000);
+
+        u.onstart = function () {
+          started = true;
+          clearTimeout(watchdog);
+          if (mine === token) mark(c.el);
+        };
+        u.onend = function () {
+          clearTimeout(watchdog);
+          if (mine === token && state === 'playing') speakFrom(index + 1);
+        };
+        u.onerror = function (e) {
+          clearTimeout(watchdog);
+          if (mine !== token) return;
+          var code = e && e.error;
+          if (code === 'interrupted' || code === 'canceled') return;
+          if (!plain && code !== 'not-allowed') {
+            plain = true;
+            speakFrom(index);
+            return;
+          }
+          finish();
+          note.textContent = 'वाचन सुरू होऊ शकलं नाही' + (code ? ' (' + code + ')' : '') + '.';
+        };
+        synth.speak(u);
+        // some Android/Chrome versions start in a "paused" state; nudge it
+        if (synth.paused) synth.resume();
+      }, 80);
+    }
+
+    function start() {
+      collect();
+      if (!chunks.length) return;
+      note.textContent = '';
+      if (!voice) {
+        note.textContent = 'या उपकरणावर मराठी आवाज उपलब्ध नाही; तुमच्या ब्राउझरचा डीफॉल्ट आवाज वापरला जाईल.';
+      } else if (voice.__fallback) {
+        note.textContent = 'मराठी आवाज उपलब्ध नाही, म्हणून हिंदी आवाज वापरला आहे.';
+      }
+      speakFrom(0);
+    }
+
+    function pause() {
+      // cancel and remember the position: more reliable than synth.pause() on phones
+      token++;
+      synth.cancel();
+      state = 'paused';
+      ui();
+    }
+
+    mainBtn.addEventListener('click', function () {
+      if (state === 'idle') start();
+      else if (state === 'playing') pause();
+      else speakFrom(index);
+    });
+
+    stopBtn.addEventListener('click', function () {
+      synth.cancel();
+      finish();
+    });
+
+    speedBtn.addEventListener('click', function () {
+      speedIdx = (speedIdx + 1) % SPEEDS.length;
+      try { localStorage.setItem('listen-rate', String(SPEEDS[speedIdx])); } catch (e) {}
+      if (state === 'playing') speakFrom(index);
+      else ui();
+    });
+
+    // stop talking when the reader leaves the page
+    window.addEventListener('pagehide', function () { synth.cancel(); });
+    ui();
+  })();
+</script>

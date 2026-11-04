@@ -386,6 +386,91 @@ button:focus-visible {
   font-size: 16px;
 }
 
+/* ---------- read-aloud button ("ऐका") ---------- */
+
+.listen {
+  margin-top: 20px;
+}
+
+.listen[hidden] {
+  display: none;
+}
+
+.listen-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.listen-main,
+.listen-aux {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid var(--link);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--link);
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+}
+
+.listen-main {
+  padding: 10px 20px 10px 16px;
+}
+
+.listen-aux {
+  min-width: 40px;
+  height: 40px;
+  padding: 0 12px;
+}
+
+.listen-main:hover,
+.listen-aux:hover,
+.listen.is-active .listen-main {
+  background: var(--link);
+  color: #fff;
+}
+
+.listen .ic[hidden],
+.listen-aux[hidden] {
+  display: none;
+}
+
+.listen-note {
+  margin-top: 8px;
+  min-height: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.listen-note:empty {
+  display: none;
+}
+
+/* the paragraph being read */
+.essay .is-reading {
+  background: var(--surface);
+  box-shadow: 0 0 0 8px var(--surface);
+  border-radius: 4px;
+  transition: background 0.25s, box-shadow 0.25s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .listen-main,
+  .listen-aux,
+  .essay .is-reading {
+    transition: none;
+  }
+}
+
 /* ---------- title bar (appears on essay pages after the title scrolls away) ---------- */
 
 .title-bar {
