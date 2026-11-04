@@ -2,6 +2,7 @@
 import { render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import FeedbackLetter from '../../components/FeedbackLetter.astro';
+import ListenButton from '../../components/ListenButton.astro';
 import { getEssays, topicName } from '../../lib/essays';
 import { formatDate, readingLabel } from '../../lib/format';
 
@@ -27,6 +28,7 @@ const { title, description, pubDate, topic } = essay.data;
           <a href={`/topics/${topic}/`}>{topicName(topic)}</a> · {formatDate(pubDate)} · {readingLabel(essay.body)} वाचन
         </div>
         <h1>{title}</h1>
+        <ListenButton />
         <div class="prose">
           <Content />
         </div>
