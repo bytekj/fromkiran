@@ -7,9 +7,11 @@ import { getEssays, isPoem, topicName } from '../lib/essays';
 import { formatDate } from '../lib/format';
 
 const all = await getEssays();
-const prose = all.filter((e) => !isPoem(e));
-const poems = all.filter(isPoem);
-const [latest, ...older] = prose;
+const [latest, ..._rest] = all.filter((e) => !isPoem(e));
+// recent list: newest essays and poems together, by date
+const RECENT = 8;
+const recent = all.filter((e) => e !== latest).slice(0, RECENT);
+const poems = all.filter((e) => isPoem(e) && !recent.includes(e));
 ---
 
 <Base>
@@ -34,16 +36,16 @@ const [latest, ...older] = prose;
     }
 
     {
-      older.length > 0 && (
+      recent.length > 0 && (
         <section id="essays">
           <div class="home-section-head">
-            <h2>आधीचे लेख</h2>
+            <h2>ताजे लेख आणि कविता</h2>
             <a href="/essays/" class="lnk">सर्व लेख पाहा →</a>
           </div>
           <div class="entry-list">
-            {older.map((essay, i) => (
-              <EssayCard essay={essay} index={i} />
-            ))}
+            {recent.map((essay, i) =>
+              isPoem(essay) ? <Slip essay={essay} index={i} /> : <EssayCard essay={essay} index={i} />
+            )}
           </div>
         </section>
       )
