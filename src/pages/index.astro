@@ -14,8 +14,10 @@ const latestKicker = latest ? (KICKER[latest.data.topic] ?? 'ताजा ले
 const latestLines = latest && isPoem(latest) ? poemLines(latest, 6) : [];
 // recent list: newest essays and poems together, by date
 const RECENT = 8;
-const recent = all.filter((e) => e !== latest).slice(0, RECENT);
-const poems = all.filter((e) => isPoem(e) && e !== latest && !recent.includes(e));
+const rest = all.filter((e) => e !== latest);
+// newest essays, plus every poem, so nothing from चिठ्ठ्या-चपाट्या is missing here
+const recent = rest.filter((e, i) => i < RECENT || isPoem(e));
+const poems = all.filter((e) => isPoem(e));
 ---
 
 <Base>
