@@ -3,15 +3,19 @@ import Base from '../layouts/Base.astro';
 import EssayCard from '../components/EssayCard.astro';
 import Slip from '../components/Slip.astro';
 import { SITE } from '../config';
-import { getEssays, isPoem, topicName } from '../lib/essays';
+import { getEssays, isPoem, poemLines, topicName } from '../lib/essays';
 import { formatDate } from '../lib/format';
 
 const all = await getEssays();
-const [latest, ..._rest] = all.filter((e) => !isPoem(e));
+// highlighted post: the newest of everything, essays and poems alike
+const [latest] = all;
+const KICKER = { kavita: 'ताजी कविता', charoli: 'ताजी चारोळी' } as Record<string, string>;
+const latestKicker = latest ? (KICKER[latest.data.topic] ?? 'ताजा लेख') : '';
+const latestLines = latest && isPoem(latest) ? poemLines(latest, 6) : [];
 // recent list: newest essays and poems together, by date
 const RECENT = 8;
 const recent = all.filter((e) => e !== latest).slice(0, RECENT);
-const poems = all.filter((e) => isPoem(e) && !recent.includes(e));
+const poems = all.filter((e) => isPoem(e) && e !== latest && !recent.includes(e));
 ---
 
 <Base>
@@ -25,11 +29,17 @@ const poems = all.filter((e) => isPoem(e) && !recent.includes(e));
     {
       latest && (
         <article class="featured">
-          <span class="kicker">ताजा लेख · {topicName(latest.data.topic)} · {formatDate(latest.data.pubDate)}</span>
+          <span class="kicker">{latestKicker} · {topicName(latest.data.topic)} · {formatDate(latest.data.pubDate)}</span>
           <h2>
             <a href={`/essays/${latest.id}/`}>{latest.data.title}</a>
           </h2>
-          {latest.data.description && <p>{latest.data.description}</p>}
+          {latestLines.length > 0 ? (
+            <p class="poem-text">
+              {latestLines.map((line, i) => (<>{i > 0 && <br />}{line}</>))}
+            </p>
+          ) : (
+            latest.data.description && <p>{latest.data.description}</p>
+          )}
           <a href={`/essays/${latest.id}/`} class="more">वाचा →</a>
         </article>
       )
